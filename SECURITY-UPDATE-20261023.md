@@ -6,7 +6,7 @@ Source: [Node.js October security releases](https://nodejs.org/en/blog/vulnerabi
 
 ## Verification and limitations
 
-Updated proxy tests: 98 pass and 15 fail. Baseline tests under patched Node: 45 pass and 8 fail. Legacy proxy tests require further compatibility review. Baseline dependencies already fail under patched Node; updated dependencies change failure patterns. This PR must remain a draft until proxy behavior is verified. Coveralls uses maintained @cypress/request through a targeted override to remove critical request/form-data findings.
+All 113 proxy tests pass on Node 22.23.4 and Node 24.22.1. Clean npm installation and ESLint pass. The refreshed Nock fixture now declares its HTTP status, and the obsolete pre-Node-8 prototype shim is removed. Header assertions explicitly include http-proxy's forwarded host; malformed-status/chunk tests assert the supported Node parser's rejection. No tests or assertions were removed to bypass failures. Coveralls uses maintained @cypress/request through a targeted override to remove critical request/form-data findings. The public TLS fixture now uses RSA-2048 and SHA-256 while retaining its deliberate 2015 expiry, so Node 24 can exercise certificate rejection. See test/cert-fixture.md; these are not production credentials.
 
 Native npm audit: 0 critical, 2 high, 8 moderate, 1 low findings. Counts represent affected dependency packages, not unique CVEs.
 
