@@ -308,6 +308,7 @@ describe('Basic functionality', function() {
       .expect('Access-Control-Allow-Origin', '*')
       .expectJSON({
         host: 'example.com',
+        'x-forwarded-host': '127.0.0.1:' + cors_anywhere_port,
         'x-forwarded-port': String(cors_anywhere_port),
         'x-forwarded-proto': 'http',
       }, done);
@@ -320,6 +321,7 @@ describe('Basic functionality', function() {
       .expect('Access-Control-Allow-Origin', '*')
       .expectJSON({
         host: 'example.com:1337',
+        'x-forwarded-host': '127.0.0.1:' + cors_anywhere_port,
         'x-forwarded-port': String(cors_anywhere_port),
         'x-forwarded-proto': 'http',
       }, done);
@@ -332,6 +334,7 @@ describe('Basic functionality', function() {
       .expect('Access-Control-Allow-Origin', '*')
       .expectJSON({
         host: 'example.com',
+        'x-forwarded-host': '127.0.0.1:' + cors_anywhere_port,
         'x-forwarded-port': String(cors_anywhere_port),
         'x-forwarded-proto': 'http',
       }, done);
@@ -449,23 +452,19 @@ describe('Proxy errors', function() {
       this.skip();
     }
 
-    var errorMessage = 'RangeError [ERR_HTTP_INVALID_STATUS_CODE]: Invalid status code: 0';
-    if (parseInt(process.versions.node, 10) < 9) {
-      errorMessage = 'RangeError: Invalid status code: 0';
-    }
+    var errorMessage = 'Error: Parse Error: Invalid status code';
     request(cors_anywhere)
       .get('/' + bad_status_http_server_url)
       .expect('Access-Control-Allow-Origin', '*')
       .expect(404, 'Not found because of proxy error: ' + errorMessage, done);
   });
 
-  it('Content-Encoding invalid body', function(done) {
-    // The HTTP status can't be changed because the headers have already been
-    // sent.
+  it('Reject an invalid chunked body', function(done) {
+    // Supported Node versions reject malformed chunks before forwarding headers.
     request(cors_anywhere)
       .get('/' + bad_tcp_server_url)
       .expect('Access-Control-Allow-Origin', '*')
-      .expect(418, '', done);
+      .expect(404, /Not found because of proxy error: Error: Parse Error: Invalid character in chunk size/, done);
   });
 
   it('Invalid header values', function(done) {
@@ -525,6 +524,7 @@ describe('server on https', function() {
       .expect('Access-Control-Allow-Origin', '*')
       .expectJSON({
         host: 'example.com',
+        'x-forwarded-host': '127.0.0.1:' + cors_anywhere_port,
         'x-forwarded-port': String(cors_anywhere_port),
         'x-forwarded-proto': 'https',
       }, done);
@@ -537,6 +537,7 @@ describe('server on https', function() {
       .expect('Access-Control-Allow-Origin', '*')
       .expectJSON({
         host: 'example.com',
+        'x-forwarded-host': '127.0.0.1:' + cors_anywhere_port,
         'x-forwarded-port': String(cors_anywhere_port),
         'x-forwarded-proto': 'https',
       }, done);
@@ -549,6 +550,7 @@ describe('server on https', function() {
       .expect('Access-Control-Allow-Origin', '*')
       .expectJSON({
         host: 'example.com:1337',
+        'x-forwarded-host': '127.0.0.1:' + cors_anywhere_port,
         'x-forwarded-port': String(cors_anywhere_port),
         'x-forwarded-proto': 'https',
       }, done);
@@ -973,6 +975,7 @@ describe('removeHeaders', function() {
       .expect('Access-Control-Allow-Origin', '*')
       .expectJSON({
         host: 'example.com',
+        'x-forwarded-host': '127.0.0.1:' + cors_anywhere_port,
       }, done);
   });
 
@@ -985,6 +988,7 @@ describe('removeHeaders', function() {
       .expect('Access-Control-Allow-Origin', '*')
       .expectJSON({
         host: 'example.com',
+        'x-forwarded-host': '127.0.0.1:' + cors_anywhere_port,
         cookie3: 'c',
       }, done);
   });
@@ -1005,6 +1009,7 @@ describe('setHeaders', function() {
       .expect('Access-Control-Allow-Origin', '*')
       .expectJSON({
         host: 'example.com',
+        'x-forwarded-host': '127.0.0.1:' + cors_anywhere_port,
         'x-powered-by': 'CORS Anywhere',
       }, done);
   });
@@ -1016,6 +1021,7 @@ describe('setHeaders', function() {
       .expect('Access-Control-Allow-Origin', '*')
       .expectJSON({
         host: 'example.com',
+        'x-forwarded-host': '127.0.0.1:' + cors_anywhere_port,
         'x-powered-by': 'CORS Anywhere',
       }, done);
   });
@@ -1038,6 +1044,7 @@ describe('setHeaders + removeHeaders', function() {
       .expect('Access-Control-Allow-Origin', '*')
       .expectJSON({
         host: 'example.com',
+        'x-forwarded-host': '127.0.0.1:' + cors_anywhere_port,
         'x-powered-by': 'CORS Anywhere',
       }, done);
   });
@@ -1049,6 +1056,7 @@ describe('setHeaders + removeHeaders', function() {
       .expect('Access-Control-Allow-Origin', '*')
       .expectJSON({
         host: 'example.com',
+        'x-forwarded-host': '127.0.0.1:' + cors_anywhere_port,
         'x-powered-by': 'CORS Anywhere',
       }, done);
   });
